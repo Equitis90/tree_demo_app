@@ -21,6 +21,7 @@
         $(this).css('background', 'grey');
         current_element_id = null;
         current_node_id = $(this).attr('id');
+        $(this.parent).preventDefault();
     });
     $(document).on('dblclick', '.node', function(){
         $(this.children).toggle(200);
@@ -33,6 +34,7 @@
         $('.node').preventDefault();
         current_node_id = null;
         current_element_id = $(this).attr('id');
+        $(this.parent).preventDefault();
     });
     $(document).mouseup(function (e) {
         var container = $(".node .element");
