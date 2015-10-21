@@ -1,0 +1,74 @@
+<h1 align="center">Nodes</h1>
+<div class="centered">
+  <div id="create_node" class="btn btn-success">Create new node</div>
+  <div id="edit_node" class="btn btn-info">Edit node</div>
+  <div id="delete_node" class="btn btn-danger">Delete node</div>
+  <div id="create_element" class="btn btn-success">Create new element</div>
+  <div id="edit_element" class="btn btn-info">Edit element</div>
+  <div id="delete_element" class="btn btn-danger">Delete element</div>
+</div>
+<div id="nodes_container" class="well centered" style="height: 600px; overflow-y: scroll; margin-top: 5px"></div>
+
+<script>
+    var current_node_id = null;
+    var current_element_id = null;
+    $(document).ready(function () {
+        $.ajax({
+            url: "<%= url_for({:controller => 'nodes', :action => 'draw_tree'}) %>"
+        }).done(function(json) {
+            var nodes_container = $("#nodes_container");
+            $.each(json, function(key, value) {
+                $("<ul class='node' id="+ key +">" + value.title + "</ul>").draggable(
+                    {
+                        revert : function(event, ui) {
+                            $(this).data("uiDraggable").originalPosition = {
+                                top : 0,
+                                left : 0
+                            };
+                            return !event;
+                        }
+                    }).appendTo(nodes_container);
+                $.each(value.elements, function(element_id, element_title) {
+                    $("<li class='element' id=" + element_id + ">" + element_title + "</li>").draggable(
+                        {
+                            revert: function (event, ui) {
+                                $(this).data("uiDraggable").originalPosition = {
+                                    top: 0,
+                                    left: 0
+                                };
+                                return !event;
+                            }
+                        }).appendTo($("#" + key));
+                });
+            })
+        });
+    });
+    $(document).on('click', '.node', function(){
+        $('.element').css('background', 'none');
+        $('.node').css('background', 'none');
+        $(this).css('background', 'grey');
+        current_element_id = null;
+        current_node_id = $(this).attr('id');
+    });
+    $(document).on('dblclick', '.node', function(){
+        $(this.children).slideToggle(500, function () {});
+    });
+    $(document).on('click', '.element', function(){
+        $('.element').css('background', 'none');
+        $(this).css('background', 'yellow');
+        $('.node').css('background', 'none');
+        $('.node').preventDefault();
+        current_node_id = null;
+        current_element_id = $(this).attr('id');
+    });
+    $(document).mouseup(function (e) {
+        var container = $(".node .element");
+
+        if (!container.is(e.target)){
+            $('.element').css('background', 'none');
+            $('.node').css('background', 'none');
+            current_element_id = null;
+            current_node_id = null;
+        }
+    });
+</script>
