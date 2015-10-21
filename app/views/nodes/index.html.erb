@@ -13,35 +13,7 @@
     var current_node_id = null;
     var current_element_id = null;
     $(document).ready(function () {
-        $.ajax({
-            url: "<%= url_for({:controller => 'nodes', :action => 'draw_tree'}) %>"
-        }).done(function(json) {
-            var nodes_container = $("#nodes_container");
-            $.each(json, function(key, value) {
-                $("<ul class='node' id="+ key +">" + value.title + "</ul>").draggable(
-                    {
-                        revert : function(event, ui) {
-                            $(this).data("uiDraggable").originalPosition = {
-                                top : 0,
-                                left : 0
-                            };
-                            return !event;
-                        }
-                    }).appendTo(nodes_container);
-                $.each(value.elements, function(element_id, element_title) {
-                    $("<li class='element' id=" + element_id + ">" + element_title + "</li>").draggable(
-                        {
-                            revert: function (event, ui) {
-                                $(this).data("uiDraggable").originalPosition = {
-                                    top: 0,
-                                    left: 0
-                                };
-                                return !event;
-                            }
-                        }).appendTo($("#" + key));
-                });
-            })
-        });
+        draw_tree();
     });
     $(document).on('click', '.node', function(){
         $('.element').css('background', 'none');
@@ -51,7 +23,8 @@
         current_node_id = $(this).attr('id');
     });
     $(document).on('dblclick', '.node', function(){
-        $(this.children).slideToggle(500, function () {});
+        $(this.children).toggle(200);
+        $(this.parent).preventDefault();
     });
     $(document).on('click', '.element', function(){
         $('.element').css('background', 'none');
@@ -71,4 +44,36 @@
             current_node_id = null;
         }
     });
+    function draw_tree(){
+        $.ajax({
+            url: "<%= url_for({:controller => 'nodes', :action => 'draw_tree'}) %>"
+        }).done(function(json) {
+            $("#nodes_container").empty();
+            var nodes_container = $("#nodes_container");
+            json_to_tree(json, nodes_container);
+        });
+    }
+    function json_to_tree(json, nodes_container){
+        $.each(json, function(node_id, node) {
+            var current_node = $("<ul class='node' id="+ node_id +">" + node.title + "</ul>").draggable(
+                {
+                    revert : true,
+                    stop:function(ev,ui){
+                        draw_tree();
+                    }
+                }).appendTo(nodes_container);
+            if (node.nodes !== ''){
+                json_to_tree(node.nodes, current_node);
+            }
+            $.each(node.elements, function(element_id, element_title) {
+                $("<li class='element' id=" + element_id + ">" + element_title + "</li>").draggable(
+                    {
+                        revert: true,
+                        stop:function(ev,ui){
+                            draw_tree();
+                        }
+                    }).appendTo($("#" + node_id));
+            });
+        });
+    }
 </script>
