@@ -27,6 +27,9 @@
         $(this.children).toggle(200);
         $(this.parent).preventDefault();
     });
+    $(document).on('dblclick', '.element', function(){
+        $(this.parent).preventDefault();
+    });
     $(document).on('click', '.element', function(){
         $('.element').css('background', 'none');
         $(this).css('background', 'yellow');
