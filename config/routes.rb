@@ -1,6 +1,4 @@
 Rails.application.routes.draw do
-  #resources :nodes, :element
-
   get 'draw_tree', to: 'nodes#draw_tree'
 
   get 'update_node', to: 'nodes#update'
