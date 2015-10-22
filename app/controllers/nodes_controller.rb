@@ -35,12 +35,71 @@ class NodesController < ApplicationController
   end
 
   def create
+    result = {}
+    begin
+      if params[:parent_id]
+        Node.create!(title: params[:title], parent_node_id: params[:parent_id].to_i)
+        result[:status] = 'ok'
+      else
+        Node.create!(title: params[:title])
+        result[:status] = 'ok'
+      end
+    rescue Exception => e
+      result[:status] = 'error'
+      result[:error] = e.to_s
+    end
+    respond_to do |format|
+      format.json do
+        render :json => result.to_json
+      end
+    end
   end
 
   def update
+    result = {}
+    if params[:drag]
+      node = Node.where(id: params[:id]).first
+      if node
+        node.parent_node_id = params[:parent_node_id]
+        node.save
+        result[:status] = 'ok'
+      else
+        result[:status] = 'error'
+        result[:error] = 'Node does not exists'
+      end
+    else
+      node = Node.where(id: params[:id]).first
+      if node
+        node.title = params[:title]
+        node.save
+        result[:status] = 'ok'
+      else
+        result[:status] = 'error'
+        result[:error] = 'Node does not exists'
+      end
+    end
+    respond_to do |format|
+      format.json do
+        render :json => result.to_json
+      end
+    end
   end
 
   def delete
+    result = {}
+    node = Node.where(id: params[:id]).first
+    if node
+      node.destroy
+      result[:status] = 'ok'
+    else
+      result[:status] = 'error'
+      result[:error] = 'Node does not exists'
+    end
+    respond_to do |format|
+      format.json do
+        render :json => result.to_json
+      end
+    end
   end
 
   private
