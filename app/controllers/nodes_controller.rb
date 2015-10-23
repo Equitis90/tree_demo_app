@@ -8,10 +8,10 @@ class NodesController < ApplicationController
     plain_nodes = {}
     node_connections = {}
     parent_nodes = []
-    Node.where(parent_node_id: nil).each do |parent_node|
-      parent_nodes << parent_node.id
-    end
     Node.includes(:elements).each do |node|
+      if node.parent_node_id.nil?
+        parent_nodes << node.id
+      end
       plain_nodes[node.id] = {title: node.title, elements: {}, nodes: {}}
       node_connections[node.id] = []
       Node.where(parent_node_id: node.id).each do |child_node|
