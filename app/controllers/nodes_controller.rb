@@ -4,7 +4,7 @@ class NodesController < ApplicationController
   end
 
   def draw_tree
-    @nodes = {}
+    nodes = {}
     plain_nodes = {}
     node_connections = {}
     parent_nodes = []
@@ -23,13 +23,13 @@ class NodesController < ApplicationController
     end
 
     parent_nodes.each do |node_id|
-      @nodes[node_id] = plain_nodes[node_id]
-      create_chain(node_id, @nodes[node_id][:nodes], node_connections, plain_nodes)
+      nodes[node_id] = plain_nodes[node_id]
+      create_chain(node_id, nodes[node_id][:nodes], node_connections, plain_nodes)
     end
 
     respond_to do |format|
       format.json do
-        render :json => @nodes.to_json
+        render :json => nodes.to_json
       end
     end
   end
@@ -48,6 +48,7 @@ class NodesController < ApplicationController
       result[:status] = 'error'
       result[:error] = e.to_s
     end
+
     respond_to do |format|
       format.json do
         render :json => result.to_json
@@ -78,6 +79,7 @@ class NodesController < ApplicationController
         result[:error] = 'Node does not exists'
       end
     end
+
     respond_to do |format|
       format.json do
         render :json => result.to_json
@@ -95,6 +97,7 @@ class NodesController < ApplicationController
       result[:status] = 'error'
       result[:error] = 'Node does not exists'
     end
+
     respond_to do |format|
       format.json do
         render :json => result.to_json

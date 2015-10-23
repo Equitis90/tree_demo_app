@@ -8,6 +8,7 @@ class ElementController < ApplicationController
       result[:status] = 'error'
       result[:error] = e.to_s
     end
+
     respond_to do |format|
       format.json do
         render :json => result.to_json
@@ -61,6 +62,7 @@ class ElementController < ApplicationController
       result[:status] = 'error'
       result[:error] = 'Element does not exists'
     end
+
     respond_to do |format|
       format.json do
         render :json => result.to_json
