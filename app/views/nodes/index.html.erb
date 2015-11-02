@@ -131,7 +131,7 @@
         if(node == true){
             $.ajax({
                 url: "<%= url_for({:controller => 'nodes', :action => 'update' }) %>",
-                data: {drag: true, parent_node_id: source_id, id: append_id}
+                data: {parent_node_id: source_id, id: append_id}
             }).done(function(json) {
                 if(json.status == 'ok') {
                     draw_tree();
@@ -143,7 +143,7 @@
         } else {
             $.ajax({
                 url: "<%= url_for({:controller => 'element', :action => 'update'}) %>",
-                data: {drag: true, parent_node_id: source_id, id: append_id}
+                data: {parent_node_id: source_id, id: append_id}
             }).done(function(json) {
                 if(json.status == 'ok') {
                     draw_tree();

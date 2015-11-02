@@ -19,15 +19,8 @@ class ElementController < ApplicationController
     begin
       element = Element.where(id: params[:id]).first
       if element
-        if params[:drag]
-          element.parent_node_id = params[:parent_node_id]
-          element.save!
-          result[:status] = 'ok'
-        else
-          element.title = params[:title]
-          element.save!
-          result[:status] = 'ok'
-        end
+        element.update_attributes(element_params)
+        result[:status] = 'ok'
       else
         result[:status] = 'error'
         result[:error] = 'Element does not exists'

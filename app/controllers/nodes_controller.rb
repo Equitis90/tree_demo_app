@@ -46,26 +46,13 @@ class NodesController < ApplicationController
 
   def update
     result = {}
-    if params[:drag]
-      node = Node.where(id: params[:id]).first
-      if node
-        node.parent_node_id = params[:parent_node_id]
-        node.save
-        result[:status] = 'ok'
-      else
-        result[:status] = 'error'
-        result[:error] = 'Node does not exists'
-      end
+    node = Node.where(id: params[:id]).first
+    if node
+      node.update_attributes(node_params)
+      result[:status] = 'ok'
     else
-      node = Node.where(id: params[:id]).first
-      if node
-        node.title = params[:title]
-        node.save
-        result[:status] = 'ok'
-      else
-        result[:status] = 'error'
-        result[:error] = 'Node does not exists'
-      end
+      result[:status] = 'error'
+      result[:error] = 'Node does not exists'
     end
 
     render :json => result.to_json
