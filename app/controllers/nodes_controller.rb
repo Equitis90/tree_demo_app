@@ -1,4 +1,6 @@
 class NodesController < ApplicationController
+  respond_to :json
+
   def index
 
   end
@@ -27,33 +29,19 @@ class NodesController < ApplicationController
       create_chain(node_id, nodes[node_id][:nodes], node_connections, plain_nodes)
     end
 
-    respond_to do |format|
-      format.json do
-        render :json => nodes.to_json
-      end
-    end
+    render :json => nodes.to_json
   end
 
   def create
     result = {}
     begin
-      if params[:parent_id]
-        Node.create!(title: params[:title], parent_node_id: params[:parent_id].to_i)
-        result[:status] = 'ok'
-      else
-        Node.create!(title: params[:title])
-        result[:status] = 'ok'
-      end
+      Node.create!(node_params)
+      result[:status] = 'ok'
     rescue Exception => e
       result[:status] = 'error'
       result[:error] = e.to_s
     end
-
-    respond_to do |format|
-      format.json do
-        render :json => result.to_json
-      end
-    end
+    render :json => result.to_json
   end
 
   def update
@@ -80,11 +68,7 @@ class NodesController < ApplicationController
       end
     end
 
-    respond_to do |format|
-      format.json do
-        render :json => result.to_json
-      end
-    end
+    render :json => result.to_json
   end
 
   def delete
@@ -98,11 +82,7 @@ class NodesController < ApplicationController
       result[:error] = 'Node does not exists'
     end
 
-    respond_to do |format|
-      format.json do
-        render :json => result.to_json
-      end
-    end
+    render :json => result.to_json
   end
 
   private
@@ -113,5 +93,9 @@ class NodesController < ApplicationController
         create_chain(child_node_id, nodes[child_node_id][:nodes], node_connections, plain_nodes)
       end
     end
+  end
+
+  def node_params
+    params.permit(:title, :parent_node_id)
   end
 end

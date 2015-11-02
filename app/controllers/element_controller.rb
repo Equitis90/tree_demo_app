@@ -1,55 +1,43 @@
 class ElementController < ApplicationController
+  respond_to :json
+
   def create
     result = {}
     begin
-        Element.create!(title: params[:title], node_id: params[:parent_id].to_i)
-        result[:status] = 'ok'
+      Element.create!(element_params)
+      result[:status] = 'ok'
     rescue Exception => e
       result[:status] = 'error'
       result[:error] = e.to_s
     end
 
-    respond_to do |format|
-      format.json do
-        render :json => result.to_json
-      end
-    end
+    render :json => result.to_json
   end
 
   def update
     result = {}
     begin
-      if params[:drag]
-        element = Element.where(id: params[:id]).first
-        if element
-          element.node_id = params[:parent_node_id]
+      element = Element.where(id: params[:id]).first
+      if element
+        if params[:drag]
+          element.parent_node_id = params[:parent_node_id]
           element.save!
           result[:status] = 'ok'
         else
-          result[:status] = 'error'
-          result[:error] = 'Element does not exists'
-        end
-      else
-        element = Element.where(id: params[:id]).first
-        if element
           element.title = params[:title]
           element.save!
           result[:status] = 'ok'
-        else
-          result[:status] = 'error'
-          result[:error] = 'Element does not exists'
         end
+      else
+        result[:status] = 'error'
+        result[:error] = 'Element does not exists'
       end
     rescue Exception => e
       result[:status] = 'error'
       result[:error] = e.to_s
     end
 
-    respond_to do |format|
-      format.json do
-        render :json => result.to_json
-      end
-    end
+    render :json => result.to_json
   end
 
   def delete
@@ -63,10 +51,11 @@ class ElementController < ApplicationController
       result[:error] = 'Element does not exists'
     end
 
-    respond_to do |format|
-      format.json do
-        render :json => result.to_json
-      end
-    end
+    render :json => result.to_json
+  end
+
+  private
+  def element_params
+    params.permit(:title, :parent_node_id)
   end
 end

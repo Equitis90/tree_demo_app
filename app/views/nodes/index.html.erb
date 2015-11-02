@@ -103,8 +103,8 @@
                     }
                 }).droppable({
                     tolerance: "pointer",
-                        greedy: true,
-                        over: function( event, ui ) {
+                    greedy: true,
+                    over: function( event, ui ) {
                         $('.node').css('background', 'none');
                         $(this).css('background', 'lightblue');
                     },
@@ -162,7 +162,7 @@
             if (current_node_id != undefined) {
                 $.ajax({
                     url: "<%= url_for({:controller => 'nodes', :action => 'create'}) %>",
-                    data: {title: title, parent_id: current_node_id}
+                    data: {title: title, parent_node_id: current_node_id}
                 }).done(function (json) {
                     if (json.status == 'ok') {
                         draw_tree();
@@ -230,7 +230,7 @@
         if(title != undefined) {
             $.ajax({
                 url: "<%= url_for({:controller => 'element', :action => 'create'}) %>",
-                data: {title: title, parent_id: current_node_id}
+                data: {title: title, parent_node_id: current_node_id}
             }).done(function (json) {
                 if (json.status == 'ok') {
                     draw_tree();

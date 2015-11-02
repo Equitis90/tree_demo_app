@@ -1,5 +1,5 @@
 class Node < ActiveRecord::Base
-  has_many :elements, :dependent => :delete_all
+  has_many :elements, :dependent => :delete_all, :foreign_key => 'parent_node_id'
 
   validates :title, presence: true
 
