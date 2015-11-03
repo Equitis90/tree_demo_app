@@ -133,24 +133,14 @@
                 url: "<%= url_for({:controller => 'nodes', :action => 'update' }) %>",
                 data: {parent_node_id: source_id, id: append_id}
             }).done(function(json) {
-                if(json.status == 'ok') {
-                    draw_tree();
-                } else {
-                    alert(json.error);
-                    draw_tree();
-                }
+                draw_tree();
             });
         } else {
             $.ajax({
                 url: "<%= url_for({:controller => 'element', :action => 'update'}) %>",
                 data: {parent_node_id: source_id, id: append_id}
             }).done(function(json) {
-                if(json.status == 'ok') {
-                    draw_tree();
-                } else {
-                    alert(json.error);
-                    draw_tree();
-                }
+                draw_tree();
             });
         }
     }
@@ -164,24 +154,14 @@
                     url: "<%= url_for({:controller => 'nodes', :action => 'create'}) %>",
                     data: {title: title, parent_node_id: current_node_id}
                 }).done(function (json) {
-                    if (json.status == 'ok') {
-                        draw_tree();
-                    } else {
-                        alert(json.error);
-                        draw_tree();
-                    }
+                    draw_tree();
                 });
             } else {
                 $.ajax({
                     url: "<%= url_for({:controller => 'nodes', :action => 'create'}) %>",
                     data: {title: title}
                 }).done(function (json) {
-                    if (json.status == 'ok') {
-                        draw_tree();
-                    } else {
-                        alert(json.error);
-                        draw_tree();
-                    }
+                    draw_tree();
                 });
             }
         }
@@ -196,12 +176,7 @@
                 url: "<%= url_for({:controller => 'nodes', :action => 'update'}) %>",
                 data: {title: title, id: current_node_id}
             }).done(function(json) {
-                if(json.status == 'ok') {
-                    draw_tree();
-                } else {
-                    alert(json.error);
-                    draw_tree();
-                }
+                draw_tree();
             });
         }
     }
@@ -214,12 +189,7 @@
                 url: "<%= url_for({:controller => 'nodes', :action => 'delete'}) %>",
                 data: {id: current_node_id}
             }).done(function(json) {
-                if(json.status == 'ok') {
-                    draw_tree();
-                } else {
-                    alert(json.error);
-                    draw_tree();
-                }
+                draw_tree();
             });
         }
     }
@@ -232,12 +202,7 @@
                 url: "<%= url_for({:controller => 'element', :action => 'create'}) %>",
                 data: {title: title, parent_node_id: current_node_id}
             }).done(function (json) {
-                if (json.status == 'ok') {
-                    draw_tree();
-                } else {
-                    alert(json.error);
-                    draw_tree();
-                }
+                draw_tree();
             });
 
         }
@@ -252,12 +217,7 @@
                 url: "<%= url_for({:controller => 'element', :action => 'update'}) %>",
                 data: {title: title, id: current_element_id}
             }).done(function(json) {
-                if(json.status == 'ok') {
-                    draw_tree();
-                } else {
-                    alert(json.error);
-                    draw_tree();
-                }
+                draw_tree();
             });
         }
     }
@@ -270,12 +230,7 @@
                 url: "<%= url_for({:controller => 'element', :action => 'delete'}) %>",
                 data: {id: current_element_id}
             }).done(function(json) {
-                if(json.status == 'ok') {
-                    draw_tree();
-                } else {
-                    alert(json.error);
-                    draw_tree();
-                }
+                draw_tree();
             });
         }
     }

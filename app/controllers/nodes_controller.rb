@@ -33,43 +33,15 @@ class NodesController < ApplicationController
   end
 
   def create
-    result = {}
-    begin
-      Node.create!(node_params)
-      result[:status] = 'ok'
-    rescue Exception => e
-      result[:status] = 'error'
-      result[:error] = e.to_s
-    end
-    render :json => result.to_json
+    respond_with Node.create!(node_params)
   end
 
   def update
-    result = {}
-    node = Node.where(id: params[:id]).first
-    if node
-      node.update_attributes(node_params)
-      result[:status] = 'ok'
-    else
-      result[:status] = 'error'
-      result[:error] = 'Node does not exists'
-    end
-
-    render :json => result.to_json
+    respond_with Node.where(id: params[:id]).first.update_attributes(node_params)
   end
 
   def delete
-    result = {}
-    node = Node.where(id: params[:id]).first
-    if node
-      node.destroy
-      result[:status] = 'ok'
-    else
-      result[:status] = 'error'
-      result[:error] = 'Node does not exists'
-    end
-
-    render :json => result.to_json
+    respond_with Node.destroy(params[:id])
   end
 
   private
