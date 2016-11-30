@@ -1,237 +1,244 @@
 <h1 align="center">Tree demo</h1>
 <div class="centered">
-  <div id="create_node" class="btn btn-success" onclick="createNode()">Create new node</div>
-  <div id="edit_node" class="btn btn-info" onclick="editNode()">Edit node</div>
-  <div id="delete_node" class="btn btn-danger" onclick="deleteNode()">Delete node</div>
-  <div id="create_element" class="btn btn-success" onclick="createNewElement()">Create new element</div>
-  <div id="edit_element" class="btn btn-info" onclick="editElement()">Edit element</div>
-  <div id="delete_element" class="btn btn-danger" onclick="deleteElement()">Delete element</div>
+  <div id="create_node" class="btn btn-success">Create new node</div>
+  <div id="edit_node" class="btn btn-info">Edit node</div>
+  <div id="delete_node" class="btn btn-danger">Delete node</div>
+  <div id="create_element" class="btn btn-success">Create new element</div>
+  <div id="edit_element" class="btn btn-info">Edit element</div>
+  <div id="delete_element" class="btn btn-danger">Delete element</div>
 </div>
-<div id="nodes_container" class="well centered" style="height: 600px; overflow-y: scroll; margin-top: 5px"></div>
+<div id="nodes_container" class="well centered"></div>
 
 <script>
-    $(document).ready(function () {
-        $('#edit_node').hide();
-        $('#delete_node').hide();
-        $('#create_element').hide();
-        $('#edit_element').hide();
-        $('#delete_element').hide();
-        draw_tree();
+  $(document).ready(function () {
+    $('#edit_node').hide();
+    $('#delete_node').hide();
+    $('#create_element').hide();
+    $('#edit_element').hide();
+    $('#delete_element').hide();
+    drawTree();
+    $('.centered').children().each(function() {
+      var button_id = this.id;
+      $("#" + button_id).click(function() {
+        var functionName = $.camelCase(button_id.replace('_', '-'));
+        window[functionName]();
+      });
     });
+  });
 
-    $(document).on('click', '.node', function(e){
-        $('#create_node').show();
-        $('#edit_node').show();
-        $('#delete_node').show();
-        $('#create_element').show();
-        $('#edit_element').hide();
-        $('#delete_element').hide();
-        $('.element').css('background', 'none');
-        $('.element').removeClass('selected');
-        $('.node').css('background', 'none');
-        $('.node').removeClass('selected');
-        $(this).css('background', 'lightgrey');
-        $(this).addClass('selected');
-        e.stopPropagation();
+  $(document).on('click', '.node', function(e){
+    $('#create_node').show();
+    $('#edit_node').show();
+    $('#delete_node').show();
+    $('#create_element').show();
+    $('#edit_element').hide();
+    $('#delete_element').hide();
+    $('.element').css('background', 'none');
+    $('.element').removeClass('selected');
+    $('.node').css('background', 'none');
+    $('.node').removeClass('selected');
+    $(this).css('background', 'lightgrey');
+    $(this).addClass('selected');
+    e.stopPropagation();
+  });
+
+  $(document).on('dblclick', '.node', function(e){
+    $(this.children).toggle(300);
+    e.stopPropagation();
+  });
+
+  $(document).on('dblclick', '.element', function(e){
+    e.stopPropagation();
+  });
+
+  $(document).on('click', '.element', function(e){
+    $('#create_node').hide();
+    $('#edit_node').hide();
+    $('#delete_node').hide();
+    $('#create_element').hide();
+    $('#edit_element').show();
+    $('#delete_element').show();
+    $('.element').css('background', 'none');
+    $('.element').removeClass('selected');
+    $(this).css('background', 'lightgrey');
+    $(this).addClass('selected');
+    $('.node').css('background', 'none');
+    $('.node').removeClass('selected');
+    e.stopPropagation();
+  });
+
+  $(document).mouseup(function (e) {
+    var container = $(".node .element");
+    var createNode = $('#create_node');
+    var editNode = $('#edit_node');
+    var deleteNode = $('#delete_node');
+    var createElement = $('#create_element');
+    var editElement = $('#edit_element');
+    var deleteElement = $('#delete_element');
+    if (!container.is(e.target) && !createNode.is(e.target) && !editNode.is(e.target) && !deleteNode.is(e.target)
+        && !createElement.is(e.target) && !editElement.is(e.target) && !deleteElement.is(e.target)){
+      $('.element').css('background', 'none');
+      $('.node').css('background', 'none');
+      $('.node').removeClass('selected');
+      $('.element').removeClass('selected');
+      createNode.show();
+      editNode.hide();
+      deleteNode.hide();
+      createElement.hide();
+      editElement.hide();
+      deleteElement.hide();
+    }
+  });
+
+  function drawTree(){
+    $.ajax({
+      url: "<%= url_for({:controller => 'nodes', :action => 'draw_tree'}) %>"
+    }).done(function(json) {
+      $("#nodes_container").empty();
+      var nodesContainer = $("#nodes_container");
+      jsonToTree(json, nodesContainer);
     });
+  }
 
-    $(document).on('dblclick', '.node', function(e){
-        $(this.children).toggle(300);
-        e.stopPropagation();
-    });
-
-    $(document).on('dblclick', '.element', function(e){
-        e.stopPropagation();
-    });
-
-    $(document).on('click', '.element', function(e){
-        $('#create_node').hide();
-        $('#edit_node').hide();
-        $('#delete_node').hide();
-        $('#create_element').hide();
-        $('#edit_element').show();
-        $('#delete_element').show();
-        $('.element').css('background', 'none');
-        $('.element').removeClass('selected');
-        $(this).css('background', 'lightgrey');
-        $(this).addClass('selected');
-        $('.node').css('background', 'none');
-        $('.node').removeClass('selected');
-        e.stopPropagation();
-    });
-
-    $(document).mouseup(function (e) {
-        var container = $(".node .element");
-        var create_node = $('#create_node');
-        var edit_node = $('#edit_node');
-        var delete_node = $('#delete_node');
-        var create_element = $('#create_element');
-        var edit_element = $('#edit_element');
-        var delete_element = $('#delete_element');
-        if (!container.is(e.target) && !create_node.is(e.target) && !edit_node.is(e.target) && !delete_node.is(e.target)
-                && !create_element.is(e.target) && !edit_element.is(e.target) && !delete_element.is(e.target)){
-            $('.element').css('background', 'none');
-            $('.node').css('background', 'none');
-            $('.node').removeClass('selected');
-            $('.element').removeClass('selected');
-            create_node.show();
-            edit_node.hide();
-            delete_node.hide();
-            create_element.hide();
-            edit_element.hide();
-            delete_element.hide();
+  function jsonToTree(json, nodesContainer){
+    $.each(json, function(nodeId, node) {
+      var currentNode = $("<ul class='node' style='color: green' id="+ nodeId +">" + node.title + "</ul>").draggable(
+          {
+            zIndex: 101,
+            stop:function(ev,ui){
+              drawTree();
+            }
+          }).droppable({
+        tolerance: "pointer",
+        greedy: true,
+        over: function( event, ui ) {
+          $('.node').css('background', 'none');
+          $(this).css('background', 'lightblue');
+        },
+        drop: function(event, ui){
+          appendToNode($(this).attr('id'), ui.draggable.attr('id'), ui.draggable.hasClass('node'));
         }
+      }).val(node.title).appendTo(nodesContainer);
+      if (node.nodes !== ''){
+        jsonToTree(node.nodes, currentNode);
+      }
+      $.each(node.elements, function(elementId, elementTitle) {
+        $("<li class='element' style='color: blue' id=" + elementId +">" + elementTitle + "</li>").draggable(
+            {
+              zIndex: 101,
+              stop:function(ev,ui){
+                drawTree();
+              }
+            }).appendTo($("#" + nodeId));
+      });
     });
+  }
 
-    function draw_tree(){
+  function appendToNode(sourceId, appendId, node){
+    if(node == true){
+      $.ajax({
+        url: "<%= url_for({:controller => 'nodes', :action => 'update' }) %>",
+        data: {parent_node_id: sourceId, id: appendId}
+      }).done(function(json) {
+        drawTree();
+      });
+    } else {
+      $.ajax({
+        url: "<%= url_for({:controller => 'element', :action => 'update'}) %>",
+        data: {parent_node_id: sourceId, id: appendId}
+      }).done(function(json) {
+        drawTree();
+      });
+    }
+  }
+
+  function createNode(){
+    var currentNodeId = $(".selected").attr('id');
+    var title = prompt("Enter new node title : ", "title");
+    if(title != undefined) {
+      if (currentNodeId != undefined) {
         $.ajax({
-            url: "<%= url_for({:controller => 'nodes', :action => 'draw_tree'}) %>"
-        }).done(function(json) {
-            $("#nodes_container").empty();
-            var nodes_container = $("#nodes_container");
-            json_to_tree(json, nodes_container);
+          url: "<%= url_for({:controller => 'nodes', :action => 'create'}) %>",
+          data: {title: title, parent_node_id: currentNodeId}
+        }).done(function (json) {
+          drawTree();
         });
-    }
-
-    function json_to_tree(json, nodes_container){
-        $.each(json, function(node_id, node) {
-            var current_node = $("<ul class='node' style='color: green' id="+ node_id +">" + node.title + "</ul>").draggable(
-                {
-                    zIndex: 101,
-                    stop:function(ev,ui){
-                        draw_tree();
-                    }
-                }).droppable({
-                    tolerance: "pointer",
-                    greedy: true,
-                    over: function( event, ui ) {
-                        $('.node').css('background', 'none');
-                        $(this).css('background', 'lightblue');
-                    },
-                    drop: function(event, ui){
-                        appendToNode($(this).attr('id'), ui.draggable.attr('id'), ui.draggable.hasClass('node'));
-                    }
-                    }).val(node.title).appendTo(nodes_container);
-            if (node.nodes !== ''){
-                json_to_tree(node.nodes, current_node);
-            }
-            $.each(node.elements, function(element_id, element_title) {
-                $("<li class='element' style='color: blue' id=" + element_id +">" + element_title + "</li>").draggable(
-                    {
-                        zIndex: 101,
-                        stop:function(ev,ui){
-                            draw_tree();
-                        }
-                    }).appendTo($("#" + node_id));
-            });
+      } else {
+        $.ajax({
+          url: "<%= url_for({:controller => 'nodes', :action => 'create'}) %>",
+          data: {title: title}
+        }).done(function (json) {
+          drawTree();
         });
+      }
     }
+  }
 
-    function appendToNode(source_id, append_id, node){
-        if(node == true){
-            $.ajax({
-                url: "<%= url_for({:controller => 'nodes', :action => 'update' }) %>",
-                data: {parent_node_id: source_id, id: append_id}
-            }).done(function(json) {
-                draw_tree();
-            });
-        } else {
-            $.ajax({
-                url: "<%= url_for({:controller => 'element', :action => 'update'}) %>",
-                data: {parent_node_id: source_id, id: append_id}
-            }).done(function(json) {
-                draw_tree();
-            });
-        }
+  function editNode(){
+    var currentNodeId = $(".selected").attr('id');
+    var currentTitle = $(".selected").val();
+    var title = prompt("Enter new title: ", currentTitle);
+    if(title != undefined){
+      $.ajax({
+        url: "<%= url_for({:controller => 'nodes', :action => 'update'}) %>",
+        data: {title: title, id: currentNodeId}
+      }).done(function(json) {
+        drawTree();
+      });
     }
+  }
 
-    function createNode(){
-        var current_node_id = $(".selected").attr('id');
-        var title = prompt("Enter new node title : ", "title");
-        if(title != undefined) {
-            if (current_node_id != undefined) {
-                $.ajax({
-                    url: "<%= url_for({:controller => 'nodes', :action => 'create'}) %>",
-                    data: {title: title, parent_node_id: current_node_id}
-                }).done(function (json) {
-                    draw_tree();
-                });
-            } else {
-                $.ajax({
-                    url: "<%= url_for({:controller => 'nodes', :action => 'create'}) %>",
-                    data: {title: title}
-                }).done(function (json) {
-                    draw_tree();
-                });
-            }
-        }
+  function deleteNode(){
+    var currentNodeId = $(".selected").attr('id');
+    var deleteConfirmation = confirm("Delete this node?");
+    if(deleteConfirmation){
+      $.ajax({
+        url: "<%= url_for({:controller => 'nodes', :action => 'delete'}) %>",
+        data: {id: currentNodeId}
+      }).done(function(json) {
+        drawTree();
+      });
     }
+  }
 
-    function editNode(){
-        var current_node_id = $(".selected").attr('id');
-        var current_title = $(".selected").val();
-        var title = prompt("Enter new title: ", current_title);
-        if(title != undefined){
-            $.ajax({
-                url: "<%= url_for({:controller => 'nodes', :action => 'update'}) %>",
-                data: {title: title, id: current_node_id}
-            }).done(function(json) {
-                draw_tree();
-            });
-        }
+  function createElement(){
+    var currentNodeId = $(".selected").attr('id');
+    var title = prompt("Enter new element title : ", "title");
+    if(title != undefined) {
+      $.ajax({
+        url: "<%= url_for({:controller => 'element', :action => 'create'}) %>",
+        data: {title: title, parent_node_id: currentNodeId}
+      }).done(function (json) {
+        drawTree();
+      });
+
     }
+  }
 
-    function deleteNode(){
-        var current_node_id = $(".selected").attr('id');
-        var deleteConfirmation = confirm("Delete this node?");
-        if(deleteConfirmation){
-            $.ajax({
-                url: "<%= url_for({:controller => 'nodes', :action => 'delete'}) %>",
-                data: {id: current_node_id}
-            }).done(function(json) {
-                draw_tree();
-            });
-        }
+  function editElement(){
+    var currentElementId = $(".selected").attr('id');
+    var currentTitle = $(".selected").text();
+    var title = prompt("Enter new title: ", currentTitle);
+    if(title != undefined){
+      $.ajax({
+        url: "<%= url_for({:controller => 'element', :action => 'update'}) %>",
+        data: {title: title, id: currentElementId}
+      }).done(function(json) {
+        drawTree();
+      });
     }
+  }
 
-    function createNewElement(){
-        var current_node_id = $(".selected").attr('id');
-        var title = prompt("Enter new element title : ", "title");
-        if(title != undefined) {
-            $.ajax({
-                url: "<%= url_for({:controller => 'element', :action => 'create'}) %>",
-                data: {title: title, parent_node_id: current_node_id}
-            }).done(function (json) {
-                draw_tree();
-            });
-
-        }
+  function deleteElement(){
+    var currentElementId = $(".selected").attr('id');
+    var deleteConfirmation = confirm("Delete this element?");
+    if(deleteConfirmation){
+      $.ajax({
+        url: "<%= url_for({:controller => 'element', :action => 'delete'}) %>",
+        data: {id: currentElementId}
+      }).done(function(json) {
+        drawTree();
+      });
     }
-
-    function editElement(){
-        var current_element_id = $(".selected").attr('id');
-        var current_title = $(".selected").text();
-        var title = prompt("Enter new title: ", current_title);
-        if(title != undefined){
-            $.ajax({
-                url: "<%= url_for({:controller => 'element', :action => 'update'}) %>",
-                data: {title: title, id: current_element_id}
-            }).done(function(json) {
-                draw_tree();
-            });
-        }
-    }
-
-    function deleteElement(){
-        var current_element_id = $(".selected").attr('id');
-        var deleteConfirmation = confirm("Delete this element?");
-        if(deleteConfirmation){
-            $.ajax({
-                url: "<%= url_for({:controller => 'element', :action => 'delete'}) %>",
-                data: {id: current_element_id}
-            }).done(function(json) {
-                draw_tree();
-            });
-        }
-    }
+  }
 </script>
