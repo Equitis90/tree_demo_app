@@ -17,7 +17,7 @@
     $('#edit_element').hide();
     $('#delete_element').hide();
     drawTree();
-    $('.centered').children().each(function() {
+    $('.centered > div').each(function() {
       var button_id = this.id;
       $("#" + button_id).click(function() {
         var functionName = $.camelCase(button_id.replace('_', '-'));
